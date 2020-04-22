@@ -1,0 +1,148 @@
+<#assign className = table.className>
+<#assign classNameLower = className?uncap_first>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="${basepackage}.dao.${subpackage}.${className}Dao">
+    <resultMap id="BaseResultMap" type="${basepackage}.api.${subpackage}.${className}">
+    <#list table.columns as column>
+        <result column="${column.constantName}" property="${column.columnNameLower}"/>
+    </#list>
+    </resultMap>
+    <sql id="Base_Column_List">
+    <#list table.columns as column>
+    ${column.constantName}<#if column_has_next>,</#if>
+    </#list>
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from  ${table.sqlName}
+        where ID =   <#if 1=1>#</#if>{value}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from  ${table.sqlName}
+        where ID =   <#if 1=1>#</#if>{value}
+    </delete>
+    <insert id="insert" parameterType="${basepackage}.api.${subpackage}.${className}">
+        insert into  ${table.sqlName} (
+        <include refid="Base_Column_List"/>
+        )
+        values (
+    <#list table.columns as column>
+        <#if   column.javaType == "Integer" >
+            <#if 1=1>#</#if>{${column.columnNameLower}, jdbcType= INTEGER }<#if column_has_next>,</#if>
+        <#else>
+            <#if 1=1>#</#if>{${column.columnNameLower}, jdbcType= VARCHAR }<#if column_has_next>,</#if>
+        </#if>
+    </#list>
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="${basepackage}.api.${subpackage}.${className}">
+        insert into  ${table.sqlName}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <#list table.columns as column>
+            <if test="${column.columnNameLower} != null">
+            ${column.constantName},
+            </if>
+            </#list>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+        <#list table.columns as column>
+        <if test="${column.columnNameLower} != null">
+            <#if   column.javaType == "Integer" >
+                <#if 1=1>#</#if>{${column.columnNameLower}, jdbcType= INTEGER },
+            <#else>
+                <#if 1=1>#</#if>{${column.columnNameLower}, jdbcType= VARCHAR },
+            </#if>
+        </if>
+        </#list>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="${basepackage}.api.${subpackage}.${className}">
+        update  ${table.sqlName}
+        <set>
+        <#list table.columns as column>
+            <if test="${column.columnNameLower} != null">
+                <#if   column.javaType == "Integer" >
+                ${column.constantName}=<#if 1=1>#</#if>{${column.columnNameLower}, jdbcType= INTEGER },
+                <#else>
+                ${column.constantName}= <#if 1=1>#</#if>{${column.columnNameLower}, jdbcType= VARCHAR },
+                </#if>
+            </if>
+        </#list>
+        </set>
+        where ID = <#if 1=1>#</#if>{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="${basepackage}.api.${subpackage}.${className}">
+        update  ${table.sqlName}
+        set
+    <#list table.columns as column>
+        <#if   column.javaType == "Integer" >
+        ${column.constantName}=<#if 1=1>#</#if>{${column.columnNameLower}, jdbcType= INTEGER }<#if column_has_next>,</#if>
+        <#else>
+        ${column.constantName}= <#if 1=1>#</#if>{${column.columnNameLower}, jdbcType= VARCHAR }<#if column_has_next>,</#if>
+        </#if>
+    </#list>
+        where ID = <#if 1=1>#</#if>{id,jdbcType=VARCHAR}
+    </update>
+    <select id="selectList" resultMap="BaseResultMap" parameterType="${basepackage}.api.${subpackage}.${className}">
+        select
+        <include refid="Base_Column_List"/>
+        from  ${table.sqlName} t
+        <where>
+            1=1
+        <#list table.columns as column>
+            <#if   column.javaType == "Integer" >
+                <if test="${column.columnNameLower} != null  ">
+                    and t.${column.constantName} =  <#if 1=1>#</#if>{${column.columnNameLower}}
+                </if>
+            <#else>
+                <if test="${column.columnNameLower} != null ">
+                    and t.${column.constantName} =  <#if 1=1>#</#if>{${column.columnNameLower}}
+                </if>
+            </#if>
+        </#list>
+        </where>
+    </select>
+    <select id="select_page" resultMap="BaseResultMap" parameterType="${basepackage}.api.${subpackage}.${className}">
+        select
+        <include refid="Base_Column_List"/>
+        from  ${table.sqlName} t
+        <where>
+            1=1
+        <#list table.columns as column>
+            <#if   column.javaType == "Integer" >
+                <if test="${column.columnNameLower} != null  ">
+                    and t.${column.constantName} =  <#if 1=1>#</#if>{${column.columnNameLower}}
+                </if>
+            <#else>
+                <if test="${column.columnNameLower} != null ">
+                    and t.${column.constantName} =  <#if 1=1>#</#if>{${column.columnNameLower}}
+                </if>
+            </#if>
+        </#list>
+        </where>
+    </select>
+    <insert id="insertByBatch" parameterType="java.util.List">
+        insert into  ${table.sqlName}
+        (    <include refid="Base_Column_List"/>)
+        <foreach collection="list" open="(" close=")" item="item" separator="union all">
+            select
+            <#list table.columns as column>
+                <#if 1=1>#</#if>{item.${column.columnNameLower}},
+            </#list>
+            from dual
+        </foreach>
+    </insert>
+    <delete id="deleteByBatch" parameterType="java.util.List">
+        delete from  ${table.sqlName}
+        where id in (
+        <foreach collection="list" item="item" separator=",">
+        <#if 1=1>#</#if>{item}
+        </foreach>
+        )
+    </delete>
+
+
+</mapper>
